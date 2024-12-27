@@ -1,101 +1,118 @@
-import Image from "next/image";
+"use client";
+import { useEffect, useRef, useState } from "react";
+
+// Definição do tipo Product com título e descrição
+type Product = {
+ title: string;
+ description: string;
+};
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+ // Estado para armazenar produtos (title e description)
+ const [items, setItems] = useState<Product[]>([]);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+ // Estado para controlar o filtro de pesquisa
+ const [filter, setFilter] = useState<string>("");
+
+ // Referências para os inputs de título e descrição
+ const inputTitle = useRef<HTMLInputElement>(null);
+ const inputDescription = useRef<HTMLInputElement>(null);
+
+ // Efeito de debug, que pode ser removido após o desenvolvimento
+ useEffect(() => {
+  console.log("refresh");
+ });
+
+ // Função para adicionar um novo produto
+ const handleAddProduct = (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault(); // Previne o comportamento padrão (recarregar a página)
+
+  // Verifica se os campos de entrada estão preenchidos
+  if (!inputTitle.current || !inputDescription.current) return;
+
+  // Adiciona um novo produto à lista de produtos
+  const newProduct: Product = {
+   title: inputTitle.current.value,
+   description: inputDescription.current.value,
+  };
+
+  setItems((prev) => [...prev, newProduct]);
+  inputTitle.current.value = "";
+  inputDescription.current.value = "";
+ };
+
+ // Função para filtrar os itens com base no título ou descrição
+ const filteredItems = items.filter(
+  (item) =>
+   item.title.toLowerCase().includes(filter.toLowerCase()) ||
+   item.description.toLowerCase().includes(filter.toLowerCase()),
+ );
+
+ return (
+  <div className="min-h-screen bg-gradient-to-r from-purple-600 to-purple-800 p-8 font-sans">
+   <div className="w-full max-w-4xl mx-auto bg-white shadow-xl rounded-2xl p-8">
+    <h1 className="text-3xl font-semibold text-center text-gray-800 mb-8">Gestão de Produtos</h1>
+
+    {/* Campo de pesquisa */}
+    <div className="mb-6 flex items-center justify-center">
+     <input
+      type="text"
+      value={filter}
+      onChange={(e) => setFilter(e.currentTarget.value)} // Atualiza o filtro
+      placeholder="Procurar produto..."
+      className="w-3/4 p-3 rounded-lg border border-gray-300 shadow-md focus:outline-none focus:ring-2 focus:ring-purple-400 transition duration-200"
+     />
     </div>
-  );
+
+    {/* Formulário de adição de produto */}
+    <form className="grid grid-cols-2 gap-6" onSubmit={handleAddProduct}>
+     <div className="flex flex-col space-y-4">
+      <label htmlFor="productTitle" className="text-lg font-medium text-gray-700">
+       Título do Produto
+      </label>
+      <input
+       type="text"
+       id="productTitle"
+       ref={inputTitle}
+       className="p-3 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+       placeholder="Digite o título do produto"
+      />
+
+      <label htmlFor="productDescription" className="text-lg font-medium text-gray-700">
+       Descrição do Produto
+      </label>
+      <input
+       type="text"
+       id="productDescription"
+       ref={inputDescription}
+       className="p-3 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+       placeholder="Digite a descrição do produto"
+      />
+
+      <button
+       type="submit"
+       className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold py-3 rounded-lg shadow-md hover:from-purple-600 hover:to-indigo-500 transition duration-300"
+      >
+       Adicionar Produto
+      </button>
+     </div>
+
+     {/* Exibição dos produtos */}
+     <div className="flex flex-col space-y-4">
+      <h2 className="text-2xl font-semibold text-gray-700">Lista de Produtos</h2>
+
+      {/* Lista filtrada */}
+      <ul className="space-y-2">
+       {filteredItems.map((item, index) => (
+        <li key={index} className="bg-gray-100 p-4 rounded-lg shadow-md">
+         <h3 className="text-xl font-semibold text-gray-800">{item.title}</h3>
+         <p className="text-gray-600">{item.description}</p>
+        </li>
+       ))}
+      </ul>
+     </div>
+    </form>
+   </div>
+  </div>
+ );
 }
